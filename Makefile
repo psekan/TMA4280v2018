@@ -1,20 +1,19 @@
 CC=gcc
 CFLAGS="-O2"
 LIBS=-lm
-TARGET=bin/P1
+TARGET=pi
 MAINSRC=main.c
 
-SRC=$(wildcard *.c)
-OBJ=$(patsubst %.c, obj/%.o, $(SRC))
+SRC=$(wildcard *.c) $(wildcard riemann/*.c) $(wildcard machin/*.c)
+OBJ=$(patsubst %.c, %.o, $(SRC))
 
-MAINOBJ=$(patsubst %.c, obj/%.o, $(MAINSRC))
+MAINOBJ=$(patsubst %.c, %.o, $(MAINSRC))
 
-obj/%.o: %.c
+%.o: %.c
 	$(CC) $(CFLAGS) $(LIBS) -c $< -o $@
 
-all: $(MAINOBJ)
-	$(CC) -o $(TARGET) -Wall $(LIBS) $(MAINOBJ)
-	echo Compiling successful.
+all: $(OBJ)
+	$(CC) -o $(TARGET) -Wall $(LIBS) $(OBJ)
 
 clean:
 	rm -f $(TARGET) $(OBJ)
