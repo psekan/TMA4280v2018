@@ -54,3 +54,8 @@ dkms.conf
 # CLion
 cmake-build-debug
 CMakeLists.txt
+.idea
+
+# Executables
+pi
+utest

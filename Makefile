@@ -1,19 +1,25 @@
 CC=gcc
-CFLAGS="-O2"
+CFLAGS=-O2 -std=c99
 LIBS=-lm
 TARGET=pi
 MAINSRC=main.c
+UTESTSRC=test/unit-tests.c
+UTESTTARGET=utest
 
-SRC=$(wildcard *.c) $(wildcard riemann/*.c) $(wildcard machin/*.c)
+SRC=$(wildcard riemann/*.c) $(wildcard machin/*.c)
 OBJ=$(patsubst %.c, %.o, $(SRC))
-
-MAINOBJ=$(patsubst %.c, %.o, $(MAINSRC))
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(LIBS) -c $< -o $@
 
-all: $(OBJ)
-	$(CC) -o $(TARGET) -Wall $(LIBS) $(OBJ)
+all: $(OBJ) $(MAINOBJ)
+	$(CC) -o $(TARGET) -Wall $(OBJ) $(MAINSRC) $(LIBS)
+
+.DELETE_ON_ERROR:
+utest: $(OBJ) 
+	$(CC) -o $(UTESTTARGET) -Wall $(OBJ) $(UTESTSRC) $(LIBS)
+	./$(UTESTTARGET)
+	rm -f $(UTESTTARGET) 
 
 clean:
 	rm -f $(TARGET) $(OBJ)
