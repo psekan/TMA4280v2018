@@ -5,6 +5,8 @@ TARGET=pi
 MAINSRC=main.c
 UTESTSRC=test/unit-tests.c
 UTESTTARGET=utest
+VTESTSRC=test/verification-test.c
+VTESTTARGET=vtest 
 
 SRC=$(wildcard riemann/*.c) $(wildcard machin/*.c)
 OBJ=$(patsubst %.c, %.o, $(SRC))
@@ -20,6 +22,11 @@ utest: $(OBJ)
 	$(CC) -o $(UTESTTARGET) -Wall $(OBJ) $(UTESTSRC) $(LIBS)
 	./$(UTESTTARGET)
 	rm -f $(UTESTTARGET) 
+
+vtest: $(OBJ)
+	$(CC) -o $(VTESTTARGET) -Wall $(OBJ) $(VTESTSRC) $(LIBS)
+	./$(VTESTTARGET)
+	rm -f $(VTESTTARGET) 
 
 clean:
 	rm -f $(TARGET) $(OBJ)

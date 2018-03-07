@@ -1,7 +1,10 @@
+#define LOWERBOUND 1e-15
+
 double machinXPower(double x, unsigned long i) {
     double r = x;
     for (unsigned long n = 1; n < 2*i-1; n++) {
         r *= x;
+        if (r <= LOWERBOUND) return 0.0;
     }
     return r;
 }
