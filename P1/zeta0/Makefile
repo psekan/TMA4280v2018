@@ -3,12 +3,12 @@ CFLAGS=-O2 -std=c99
 LIBS=-lm
 TARGET=pi
 MAINSRC=main.c
-UTESTSRC=test/unit-tests.c
+UTESTSRC=unit-tests.c
 UTESTTARGET=utest
-VTESTSRC=test/verification-test.c
+VTESTSRC=verification-test.c
 VTESTTARGET=vtest 
 
-SRC=$(wildcard riemann/*.c) $(wildcard machin/*.c)
+SRC=$(wildcard computation/*.c)
 OBJ=$(patsubst %.c, %.o, $(SRC))
 
 %.o: %.c
@@ -23,6 +23,7 @@ utest: $(OBJ)
 	./$(UTESTTARGET)
 	rm -f $(UTESTTARGET) 
 
+.DELETE_ON_ERROR:
 vtest: $(OBJ)
 	$(CC) -o $(VTESTTARGET) -Wall $(OBJ) $(VTESTSRC) $(LIBS)
 	./$(VTESTTARGET)
