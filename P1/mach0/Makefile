@@ -8,7 +8,7 @@ UTESTTARGET=utest
 VTESTSRC=verification-test.c
 VTESTTARGET=vtest 
 
-SRC=$(wildcard computation/*.c)
+SRC=$(wildcard computation/*.c) $(wildcard ../mach-base/*.c)
 OBJ=$(patsubst %.c, %.o, $(SRC))
 
 %.o: %.c
