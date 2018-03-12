@@ -23,7 +23,7 @@ int dataDistribution(int numProcs, int n, int toAdd){
 
 int main(int argc, char **argv){
 
-  unsigned int n = atoi(argv[1]);
+ //unsigned int n = atoi(argv[1]);
 
   MPI_Status status;
   MPI_Init(&argc, &argv);
@@ -33,22 +33,26 @@ int main(int argc, char **argv){
   int rootProcess = 0;
   int rank;
   int numProcs;
-  int dataArray[n];
-  double result = 0;
   //int elementsToSend;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &numProcs);
-  int avgElements = n/(numProcs-1);
-  int localArray[avgElements + 1];
 
   if ( rank == rootProcess) {
     double startTime, endTime;
-    startTime = MPI_Wtime(); 
-    if (numProcs % 2 != 0) {
-      printf("Number of processes needs to be power of 2.");
+    startTime = MPI_Wtime();
+    if ((numProcs - 1) & (numProcs - 2) != 0) {
+      printf("Number of processes needs to be power of 2 + 1.");
       return 1;
     }
+    int n;
+    double result=0;
+    printf("Insert precision n:\n");
+    scanf("%d", &n);
+
+    int avgElements = n/(numProcs-1);
+    int *dataArray=malloc(sizeof(int)*n);
+
     int breakPoint = dataDistribution(numProcs-1, n, avgElements+1);
     //generating data vector
     for(unsigned i = 0; i < n; i++){
@@ -63,7 +67,7 @@ int main(int argc, char **argv){
       else elementsToSend = avgElements;
       // distribute data to each child process
       MPI_Send( &elementsToSend, 1, MPI_INT, i+1, tag, MPI_COMM_WORLD);
-      MPI_Send( &dataArray[globalRank], elementsToSend, MPI_INT, i+1, tag, MPI_COMM_WORLD);
+      MPI_Send( dataArray + globalRank, elementsToSend, MPI_INT, i+1, tag, MPI_COMM_WORLD);
       i++;
     }
 
@@ -72,29 +76,22 @@ int main(int argc, char **argv){
       MPI_Recv(&partialResult, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
       result += partialResult;  
     }
-    
-    //write results to file
-    FILE *f = fopen("../../Results/riemannParallel.txt", "w");
-    if (f == NULL)
-    {
-      printf("Error opening file!\n");
-      exit(1);
-    }
+    free(dataArray);
     endTime = MPI_Wtime();
-    fprintf(f, "n = %d,  np = %d, wall time = %f, error = %.15f\n", n, numProcs, endTime - startTime, PI - piFromRiemann(result));
-    printf("Results were written to file riemannParallel.txt in Results directory\n");
-    fclose(f);
+    printf("Procs: %d\nn: %d\nWall time: %f\nError: %.15f\n", numProcs, n, endTime - startTime, PI - piFromRiemann(result));
   }
   else {
     // child processes
     int size;
     MPI_Recv( &size, 1, MPI_INT, rootProcess, tag, MPI_COMM_WORLD, &status);
-    MPI_Recv( &localArray, size, MPI_INT, rootProcess, tag, MPI_COMM_WORLD, &status);
+    int *localArray=malloc(sizeof(int)*size);
+    MPI_Recv( localArray, size, MPI_INT,rootProcess, tag, MPI_COMM_WORLD, &status);
     partialResult = 0.0;
     for (unsigned int i=0; i < size; i++){
       partialResult += piRiemannPart(localArray[i]);
     }
     MPI_Send( &partialResult, 1, MPI_DOUBLE, rootProcess, tag, MPI_COMM_WORLD);
+    free(localArray);
   }
   
   MPI_Finalize();
