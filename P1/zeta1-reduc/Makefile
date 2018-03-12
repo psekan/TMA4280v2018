@@ -6,7 +6,7 @@ MAINSRC=main.c
 NP?=5
 RDIR=../../R
 
-SRC=$(wildcard computation/*.c) $(wildcard ../mach-base/*.c)
+SRC=$(wildcard ../zeta1/computation/*.c)
 OBJ=$(patsubst %.c, %.o, $(SRC))
 
 %.o: %.c
