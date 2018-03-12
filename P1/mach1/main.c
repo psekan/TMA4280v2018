@@ -31,7 +31,7 @@ int main(int argc, char ** argv) {
     unsigned int partSize = n / subproc;
     unsigned int nBiggerParts = n % subproc;
     unsigned int *arr = malloc(sizeof(unsigned int) * (partSize + 1));
-    unsigned int nextI = 0;
+    unsigned int nextI = 1;
     for (unsigned int p = 0; p < subproc; p++) {
       unsigned int pPartSize = partSize + (p < nBiggerParts);
       for (unsigned int i = 0; i < pPartSize; i++) {
@@ -54,14 +54,17 @@ int main(int argc, char ** argv) {
     }
     double result = (4*results[0]-results[1])*4;
     printf("%.15f\n", result);
-    printf("Procs: %d, Wall time: %f, Error: %.15f\n", subproc, (MPI_Wtime() - startTime), fabs(M_PI - result));
+    printf("Procs;%d\nWall time;%f\nError;%.15f\n", subproc, (MPI_Wtime() - startTime), fabs(M_PI - result));
   }
   else {
     unsigned int size;
     MPI_Recv(&size, 1, MPI_UNSIGNED, ROOT, TAG, MPI_COMM_WORLD, &status);
-    unsigned int *arr = malloc(sizeof(unsigned int)*size);
-    MPI_Recv(arr, size, MPI_UNSIGNED, ROOT, TAG, MPI_COMM_WORLD, &status);
-    
+    unsigned int *arr = NULL;
+    if (size > 0) {
+      arr = malloc(sizeof(unsigned int)*size);
+      MPI_Recv(arr, size, MPI_UNSIGNED, ROOT, TAG, MPI_COMM_WORLD, &status);
+    }
+
     double partialResult[2];
     partialResult[0] = partialResult[1] = 0;
     double A = 1.0/5.0, B = 1.0/239.0, tmp;
@@ -71,7 +74,7 @@ int main(int argc, char ** argv) {
       tmp = machinPart(B,arr[i]);
       partialResult[1] += tmp;
     }
-    free(arr);
+    if (arr != NULL) free(arr);
     MPI_Send(partialResult, 2, MPI_DOUBLE, ROOT, TAG, MPI_COMM_WORLD);
   }
   MPI_Finalize();
