@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
-#include "computation/riemann.h"
+#include "../zeta1/computation/riemann.h"
 
 #define PI 3.14159265358979323846
 
@@ -33,20 +33,21 @@ int main(int argc, char **argv){
   int rootProcess = 0;
   int rank;
   int numProcs;
-  //int elementsToSend;
+  double result=0;
+  int n;
+  double startTime, endTime;
+  //int elementsToSend;i
 
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &numProcs);
 
   if ( rank == rootProcess) {
-    double startTime, endTime;
     startTime = MPI_Wtime();
     if ((numProcs - 1) & (numProcs - 2) != 0) {
       printf("Number of processes needs to be power of 2 + 1.");
       return 1;
     }
-    int n;
-    double result=0;
+    //double result=0;
     printf("Insert precision n:\n");
     scanf("%d", &n);
 
@@ -72,13 +73,11 @@ int main(int argc, char **argv){
     }
 
     // collect results from each child process
-    for (int i=1; i < numProcs; i++) {
-      MPI_Recv(&partialResult, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
-      result += partialResult;  
-    }
+//    for (int i=1; i < numProcs; i++) {
+//      MPI_Recv(&partialResult, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
+//      result += partialResult;  
+//    }
     free(dataArray);
-    endTime = MPI_Wtime();
-    printf("Procs: %d\nn: %d\nWall time: %f\nError: %.15f\n", numProcs, n, endTime - startTime, PI - piFromRiemann(result));
   }
   else {
     // child processes
@@ -90,10 +89,15 @@ int main(int argc, char **argv){
     for (unsigned int i=0; i < size; i++){
       partialResult += piRiemannPart(localArray[i]);
     }
-    MPI_Send( &partialResult, 1, MPI_DOUBLE, rootProcess, tag, MPI_COMM_WORLD);
+    //MPI_Send( &partialResult, 1, MPI_DOUBLE, rootProcess, tag, MPI_COMM_WORLD);
     free(localArray);
   }
   
+  MPI_Allreduce(&partialResult, &result, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  if ( rank == rootProcess) {
+    endTime = MPI_Wtime();
+    printf("Procs: %d\nn: %d\nWall time: %f\nError: %.15f\n", numProcs, n, endTime - startTime, PI - piFromRiemann(result));
+  }
   MPI_Finalize();
   return 0;
 }
