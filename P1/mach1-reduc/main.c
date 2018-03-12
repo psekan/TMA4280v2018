@@ -15,7 +15,7 @@ int main(int argc, char ** argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   subproc = nproc - 1;
 
-  if ((subproc & (subproc - 1)) != 0) {
+  if ((subproc & (subproc - 1)) != 0 || subproc == 0) {
     if (rank == ROOT) {
       fprintf(stderr, "Number of processes must be 2^x+1\n");
     }
