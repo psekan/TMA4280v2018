@@ -19,8 +19,6 @@ int dataDistribution(int numProcs, int n, int toAdd){
   return 0;
 }
 
-
-
 int main(int argc, char **argv){
 
  //unsigned int n = atoi(argv[1]);
@@ -41,7 +39,7 @@ int main(int argc, char **argv){
   if ( rank == rootProcess) {
     double startTime, endTime;
     startTime = MPI_Wtime();
-    if ((numProcs - 1) & (numProcs - 2) != 0) {
+    if (((numProcs - 1) & (numProcs - 2)) != 0) {
       printf("Number of processes needs to be power of 2 + 1.");
       return 1;
     }
@@ -78,7 +76,8 @@ int main(int argc, char **argv){
     }
     free(dataArray);
     endTime = MPI_Wtime();
-    printf("Procs: %d\nn: %d\nWall time: %f\nError: %.15f\n", numProcs, n, endTime - startTime, PI - piFromRiemann(result));
+    printf("%.15f\n", piFromRiemann(result));
+    printf("Procs;%d\nWall time;%f\nError;%.15f\n", numProcs-1, endTime - startTime, PI - piFromRiemann(result));
   }
   else {
     // child processes
