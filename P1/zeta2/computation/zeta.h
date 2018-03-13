@@ -4,4 +4,4 @@
  * @param int n in riemann
  * @return double aproximation of PI
  */
-double zeta(int n);
+double zeta(int nthread, int n);
