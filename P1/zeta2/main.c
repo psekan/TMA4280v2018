@@ -1,6 +1,10 @@
 #include "computation/zeta.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <math.h>
+#include <math.h>
+#include <math.h>
 
 int main(int argc, char **argv){
   char *nThreads = getenv("OMP_NUM_THREADS");
@@ -16,7 +20,9 @@ int main(int argc, char **argv){
   int n; 
   printf("Insert precisition n: ");
   scanf("%d", &n);
+  time_t startTime = time(NULL);
   double result = zeta(atoi(nThreads),n);
   printf("PI is: %.15f\n", result);
+  printf("Wall time;%f\nError;%.15f\n", (double)(time(NULL) - startTime), M_PI - result);
   return 0;
 }
