@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-O2 -std=c99
-LIBS=-lm
+LIBS=-lm -fopenmp
 TARGET=pi
 MAINSRC=main.c
 
