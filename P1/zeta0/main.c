@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "riemann/serial.h"
+#include "computation/serial.h"
 
 int main(int argc, char ** argv) {
     if (argc == 1) {

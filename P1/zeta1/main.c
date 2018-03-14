@@ -39,7 +39,7 @@ int main(int argc, char **argv){
   if ( rank == rootProcess) {
     double startTime, endTime;
     startTime = MPI_Wtime();
-    if (((numProcs - 1) & (numProcs - 2)) != 0) {
+    if (((numProcs - 1) & numProcs) != 0) {
       printf("Number of processes needs to be power of 2 + 1.");
       return 1;
     }
