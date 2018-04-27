@@ -132,7 +132,8 @@ int main(int argc, char **argv)
      * reallocations at each function call.
      */
     int nn = 4 * n;
-    real *z = mk_1D_array(nn, false);
+    int threads = omp_get_max_threads();
+    real **z = mk_2D_array(threads, nn, false);
 
     /*
      * Initialize the right hand side data for a given rhs function.
@@ -161,13 +162,13 @@ int main(int argc, char **argv)
      */
     #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < sizes[rank]; i++) {
-        fst_(b[i + globalPos[rank]], &n, z, &nn);
+        fst_(b[i + globalPos[rank]], &n, z[omp_get_thread_num()], &nn);
     }
 
     transpose(bt, b, m, sizes, displacement, count, numProcs, rank);
     #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < sizes[rank]; i++) {
-        fstinv_(bt[i + globalPos[rank]], &n, z, &nn);
+        fstinv_(bt[i + globalPos[rank]], &n, z[omp_get_thread_num()], &nn);
     }
 
     /*
@@ -185,14 +186,14 @@ int main(int argc, char **argv)
      */
     #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < sizes[rank]; i++) {
-        fst_(bt[i + globalPos[rank]], &n, z, &nn);
+        fst_(bt[i + globalPos[rank]], &n, z[omp_get_thread_num()], &nn);
     }
 
     transpose(b, bt, m, sizes, displacement, count, numProcs, rank);
 
     #pragma omp paralle for schedule(static) 
     for (size_t i = 0; i < sizes[rank]; i++) {
-        fstinv_(b[i + globalPos[rank]], &n, z, &nn);
+        fstinv_(b[i + globalPos[rank]], &n, z[omp_get_thread_num()], &nn);
     }
 
     /*
