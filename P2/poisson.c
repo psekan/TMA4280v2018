@@ -214,7 +214,11 @@ int main(int argc, char **argv)
     MPI_Allreduce(&umax, &max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
     if (rank == 0){
-       printf("umax = %e\n", max);
+       printf("umax = %.15f\n", max);
+       printf("MPI = %d\n", numProcs);
+       printf("threads = %d\\n", threads);
+       printf("processors = %d\n", numProcs * threads);
+       printf("average runtime = %.15f\n%" , totalTime/numProcs);
     }
 
     free(z);
