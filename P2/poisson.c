@@ -41,6 +41,7 @@ int main(int argc, char **argv)
         printf("  poisson n\n\n");
         printf("Arguments:\n");
         printf("  n: the problem size (must be a power of 2)\n");
+        return 1;
     }
 
     int numProcs, rank;
@@ -216,7 +217,7 @@ int main(int argc, char **argv)
     if (rank == 0){
        printf("umax = %.15f\n", max);
        printf("MPI = %d\n", numProcs);
-       printf("threads = %d\\n", threads);
+       printf("threads = %d\n", threads);
        printf("processors = %d\n", numProcs * threads);
        printf("average runtime = %.15f\n%" , totalTime/numProcs);
     }
