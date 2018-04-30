@@ -207,19 +207,36 @@ int main(int argc, char **argv)
             umax = umax > b[i + globalPos[rank]][j] ? umax : b[i + globalPos[rank]][j];
         }
     }
+
+    /**
+     * Compute maximal error value
+     */
+    double emax = 0.0, elocal;
+    real x,y;
+    for(size_t i = start; i < end; i++){ 
+        for(size_t j = 0; j < m; j++){
+            x = grid[i+1+globalPos[rank]];
+            y = grid[j+1];
+            elocal = fabs(solution(x, y) - b[i][j]);
+            emax = emax > elocal ?  emax : elocal;
+        }
+    }
     
     double totalTime = MPI_Wtime()-startTime;
     double t = totalTime;
-    double max;
+    double max, error;
     MPI_Reduce(&t, &totalTime, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&emax, &error, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Allreduce(&umax, &max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
     if (rank == 0){
        printf("umax = %.15f\n", max);
+       printf("max error = %.15f\n", error);
        printf("MPI = %d\n", numProcs);
        printf("threads = %d\n", threads);
        printf("processors = %d\n", numProcs * threads);
        printf("average runtime = %.15f\n%" , totalTime/numProcs);
+       printf("max runtime = %.15f\n%" , totalTime);
     }
 
     free(z);
@@ -243,6 +260,10 @@ int main(int argc, char **argv)
 
 real rhs(real x, real y) {
     //return 2 * (y - y*y + x - x*x);
+    return 1;
+}
+
+real solution(real x, real y) {
     return 1;
 }
 
