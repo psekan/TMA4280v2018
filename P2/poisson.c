@@ -247,7 +247,7 @@ int main(int argc, char **argv)
        printf("threads = %d\n", threads);
        printf("processors = %d\n", numProcs * threads);
        printf("average runtime = %.15f\n" , totalTime/numProcs);
-       printf("max runtime = %.15f\n" , totalTime);
+       printf("total runtime = %.15f\n" , MPI_Wtime()-startTime);
     }
 
     free(z);
