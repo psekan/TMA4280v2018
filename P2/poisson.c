@@ -100,6 +100,15 @@ int main(int argc, char **argv)
         displacement[i] = sum;
         sum += count[i]; 
      }
+     
+     for (int i=0; i < numProcs; i++){
+        printf("i:%d --> %d\n", i sizes[i]);
+     }
+
+     for (int i=0; i < numProcs; i++){
+        printf("i:%d --> %d\n", i globalPos[i]);
+     }
+
 
     /*
      * The diagonal of the eigenvalue matrix of T is set with the eigenvalues
