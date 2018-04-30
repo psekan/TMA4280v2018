@@ -27,6 +27,7 @@ real *mk_1D_array(size_t n, bool zero);
 real **mk_2D_array(size_t n1, size_t n2, bool zero);
 void transpose(real **bt, real **b, size_t m, int *sizes, int *displacement, int* count, int numProcs, int rank);
 real rhs(real x, real y);
+real solution(real x, real y);
 
 // Functions implemented in FORTRAN in fst.f and called from C.
 // The trailing underscore comes from a convention for symbol names, called name
@@ -213,7 +214,7 @@ int main(int argc, char **argv)
      */
     double emax = 0.0, elocal;
     real x,y;
-    for(size_t i = start; i < end; i++){ 
+    for(size_t i = 0; i < sizes[rank]; i++){ 
         for(size_t j = 0; j < m; j++){
             x = grid[i+1+globalPos[rank]];
             y = grid[j+1];
@@ -235,8 +236,8 @@ int main(int argc, char **argv)
        printf("MPI = %d\n", numProcs);
        printf("threads = %d\n", threads);
        printf("processors = %d\n", numProcs * threads);
-       printf("average runtime = %.15f\n%" , totalTime/numProcs);
-       printf("max runtime = %.15f\n%" , totalTime);
+       printf("average runtime = %.15f\n" , totalTime/numProcs);
+       printf("max runtime = %.15f\n" , totalTime);
     }
 
     free(z);
