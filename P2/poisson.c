@@ -101,24 +101,13 @@ int main(int argc, char **argv)
         sum += count[i]; 
      }
      
-     for (int i=0; i < numProcs; i++){
-        printf("i:%d --> %d\n", i sizes[i]);
-     }
-
-     for (int i=0; i < numProcs; i++){
-        printf("i:%d --> %d\n", i globalPos[i]);
-     }
-
-
-     for (int i=0; i < numProcs; i++){
+     /*for (int i=0; i < numProcs; i++){
         printf("[r %d] [s %d] --> %d\n", rank, i, sizes[i]);
      }
 
      for (int i=0; i < numProcs; i++){
         printf("[r %d] [g %d] --> %d\n", rank, i, globalPos[i]);
-     }
-     return 0;
-
+     }*/
 
     /*
      * The diagonal of the eigenvalue matrix of T is set with the eigenvalues
