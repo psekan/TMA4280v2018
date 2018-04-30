@@ -101,6 +101,16 @@ int main(int argc, char **argv)
         sum += count[i]; 
      }
 
+     for (int i=0; i < numProcs; i++){
+        printf("[r %d] [s %d] --> %d\n", rank, i, sizes[i]);
+     }
+
+     for (int i=0; i < numProcs; i++){
+        printf("[r %d] [g %d] --> %d\n", rank, i, globalPos[i]);
+     }
+     return 0;
+
+
     /*
      * The diagonal of the eigenvalue matrix of T is set with the eigenvalues
      * defined Chapter 9. page 93 of the Lecture Notes.
@@ -117,8 +127,8 @@ int main(int argc, char **argv)
      * Allocate the matrices b and bt which will be used for storing value of
      * G, \tilde G^T, \tilde U^T, U as described in Chapter 9. page 101.
      */
-    real **b = mk_2D_array(m, m, false);
-    real **bt = mk_2D_array(m, m, false);
+    real **b = mk_2D_array(sizes[rank]+1, m, false);
+    real **bt = mk_2D_array(sizes[rank]+1, m, false);
 
     /*
      * This vector will holds coefficients of the Discrete Sine Transform (DST)
@@ -146,7 +156,7 @@ int main(int argc, char **argv)
     #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < sizes[rank]; i++) {
         for (size_t j = 0; j < m; j++) {
-            b[i + globalPos[rank]][j] = h * h * rhs(grid[i+1 + globalPos[rank]], grid[j+1]);
+            b[i][j] = h * h * rhs(grid[i+1 + globalPos[rank]], grid[j+1]);
         }
     }
 
@@ -164,13 +174,13 @@ int main(int argc, char **argv)
      */
     #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < sizes[rank]; i++) {
-        fst_(b[i + globalPos[rank]], &n, z[omp_get_thread_num()], &nn);
+        fst_(b[i], &n, z[omp_get_thread_num()], &nn);
     }
 
     transpose(bt, b, m, sizes, displacement, count, numProcs, rank);
     #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < sizes[rank]; i++) {
-        fstinv_(bt[i + globalPos[rank]], &n, z[omp_get_thread_num()], &nn);
+        fstinv_(bt[i], &n, z[omp_get_thread_num()], &nn);
     }
 
     /*
@@ -188,14 +198,14 @@ int main(int argc, char **argv)
      */
     #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < sizes[rank]; i++) {
-        fst_(bt[i + globalPos[rank]], &n, z[omp_get_thread_num()], &nn);
+        fst_(bt[i], &n, z[omp_get_thread_num()], &nn);
     }
 
     transpose(b, bt, m, sizes, displacement, count, numProcs, rank);
 
     #pragma omp paralle for schedule(static) 
     for (size_t i = 0; i < sizes[rank]; i++) {
-        fstinv_(b[i + globalPos[rank]], &n, z[omp_get_thread_num()], &nn);
+        fstinv_(b[i], &n, z[omp_get_thread_num()], &nn);
     }
 
     /*
@@ -205,7 +215,7 @@ int main(int argc, char **argv)
     double umax = 0.0;
     for (size_t i = 0; i < sizes[rank]; i++) {
         for (size_t j = 0; j < m; j++) {
-            umax = umax > b[i + globalPos[rank]][j] ? umax : b[i + globalPos[rank]][j];
+            umax = umax > b[i][j] ? umax : b[i][j];
         }
     }
 
@@ -219,7 +229,7 @@ int main(int argc, char **argv)
             x = grid[i+1 + globalPos[rank]];
             y = grid[j+1];
             //printf("sol = %.15f, comp = %.15f\n", solution(x,y), b[i + globalPos[rank]][j]);
-            elocal = fabs(solution(x, y) - b[i + globalPos[rank]][j]);
+            elocal = fabs(solution(x, y) - b[i][j]);
             emax = emax > elocal ?  emax : elocal;
         }
     }
