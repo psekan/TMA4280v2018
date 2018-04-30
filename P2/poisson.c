@@ -215,10 +215,11 @@ int main(int argc, char **argv)
     double emax = 0.0, elocal;
     real x,y;
     for(size_t i = 0; i < sizes[rank]; i++){ 
-        for(size_t j = 0; j < m; j++){
-            x = grid[i+1+globalPos[rank]];
+        for(size_t j = 0; j < m; j++) {
+            x = grid[i+1 + globalPos[rank]];
             y = grid[j+1];
-            elocal = fabs(solution(x, y) - b[i][j]);
+            //printf("sol = %.15f, comp = %.15f\n", solution(x,y), b[i + globalPos[rank]][j]);
+            elocal = fabs(solution(x, y) - b[i + globalPos[rank]][j]);
             emax = emax > elocal ?  emax : elocal;
         }
     }
@@ -227,12 +228,13 @@ int main(int argc, char **argv)
     double t = totalTime;
     double max, error;
     MPI_Reduce(&t, &totalTime, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&emax, &error, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&emax, &error, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     MPI_Allreduce(&umax, &max, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
     if (rank == 0){
        printf("umax = %.15f\n", max);
        printf("max error = %.15f\n", error);
+       printf("h^2 = %.15f\n", h*h);
        printf("MPI = %d\n", numProcs);
        printf("threads = %d\n", threads);
        printf("processors = %d\n", numProcs * threads);
@@ -261,7 +263,8 @@ int main(int argc, char **argv)
 
 real rhs(real x, real y) {
     //return 2 * (y - y*y + x - x*x);
-    return 1;
+    //return 1;
+    return 5*PI*PI*sin(PI*x)*sin(2*PI*y);
 }
 
 real w1(real x, real y) {
@@ -277,7 +280,8 @@ real w2(real x, real y) {
 }
 
 real solution(real x, real y) {
-    return x*(x-1)/2 - w1(x,y) - w2(x,y);
+    //return x*(x-1)/2 - w1(x,y) - w2(x,y);
+    return sin(PI*x)*sin(2*PI*y);
 }
 
 /*
