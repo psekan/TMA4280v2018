@@ -264,8 +264,20 @@ real rhs(real x, real y) {
     return 1;
 }
 
+real w1(real x, real y) {
+    if (x == 0 || x == 1) return 0;
+    if (y == 0) return 0;
+    return x*(x-1)/2;
+}
+
+real w2(real x, real y) {
+    if (x == 0 || x == 1) return 0;
+    if (y == 0) return x*(x-1)/2;
+    return 0;
+}
+
 real solution(real x, real y) {
-    return 1;
+    return x*(x-1)/2 - w1(x,y) - w2(x,y);
 }
 
 /*
