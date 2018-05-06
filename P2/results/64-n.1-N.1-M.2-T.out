@@ -1,0 +1,8 @@
+umax = 1.000682968393781
+max error = 0.000682968393781
+h^2 = 0.000244140625000
+MPI = 1
+threads = 2
+processors = 2
+average runtime = 0.013801246881485
+total runtime = 0.013961996883154
