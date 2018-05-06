@@ -184,7 +184,7 @@ int main(int argc, char **argv)
     /*
      * Solve Lambda * \tilde U = \tilde G (Chapter 9. page 101 step 2)
      */
-    #pragma omp paralle for schedule(static)
+    #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < sizes[rank]; i++) {
         for (size_t j = 0; j < m; j++) {
             bt[i][j] = bt[i][j] / (diag[i + globalPos[rank]] + diag[j]);
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 
     transpose(b, bt, m, sizes, displacement, count, numProcs, rank);
 
-    #pragma omp paralle for schedule(static) 
+    #pragma omp parallel for schedule(static) 
     for (size_t i = 0; i < sizes[rank]; i++) {
         fstinv_(b[i], &n, z[omp_get_thread_num()], &nn);
     }
